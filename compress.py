@@ -1,4 +1,8 @@
+import hashlib
+import lzma
 from zipfile import ZipFile
+
+import UnityPy
 
 def scan_lunartique_mod_root(zip_file: ZipFile) -> str:
     names = set()
@@ -53,13 +57,11 @@ def compress_lunartique_mod(zip_path: str, output: str):
                         parts[2] = str(obj.path_id)
                         key = "/".join(parts)
                         if key not in vanilla_dict:
-                            print("New object found, ignored because new objects are currently unsupported", "/".join(parts))
+                            print("* New object found, ignored because new objects are currently unsupported", "/".join(parts))
                             continue
                         if vanilla_dict[key] == hashlib.md5(data).digest():
                             continue
                         with z.open(key, "w") as z_f:
-                            print("Writing", key)
+                            print("* Writing", key)
                             z_f.write(compressor.compress(data))
-
-compress_lunartique_mod("/Users/octeep/Downloads/sanging cairn.zip", "output.zip")
 

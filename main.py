@@ -3,27 +3,48 @@ import glob
 import hashlib
 import os.path
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
 import signal
-from time import sleep
 from zipfile import ZipFile
+from compress import compress_lunartique_mod
 
 import UnityPy
 
-limbus_root_path = "/Users/octeep/Library/Containers/com.isaacmarovitz.Whisky/Bottles/5A2D544D-6B2F-46D3-BF44-AF8DE2AE9764/drive_c/Program Files (x86)/Steam/steamapps/common/Limbus Company"
-app_data_root = "/Users/octeep/Library/Containers/com.isaacmarovitz.Whisky/Bottles/5A2D544D-6B2F-46D3-BF44-AF8DE2AE9764/drive_c/users/crossover/AppData"
+if appdata := os.getenv("APPDATA"):
+    mod_zips_root_path = os.path.join(appdata, "LimbusCompanyMods")
+else:
+    raise Exception("APPDATA not found")
+
+os.makedirs(mod_zips_root_path, exist_ok=True)
+
+if len(sys.argv) < 2:
+    print("Usage: main.py <game_path>")
+    sys.exit(1)
 
 def bundle_data_paths():
-    return glob.glob(f"{app_data_root}/LocalLow/Unity/ProjectMoon_LimbusCompany/*/*/")
+    cache_path = os.path.join(appdata, "../LocalLow/Unity/ProjectMoon_LimbusCompany/*/*/")
+    return map(os.path.normpath, glob.glob(cache_path))
 
 def file_digest(file_path):
     with open(file_path, "rb") as ff:
         return hashlib.md5(ff.read()).hexdigest()
 
-def extract_assets(mod_asset_root: str, mod_zips_root: str):
+def detect_lunartique_mods(mod_zips_root: str):
     for mod_zip in glob.glob(f"{mod_zips_root}/*.zip"):
+        print("Compressing lunartique format mod (might take a while!):", mod_zip)
+        try:
+            compress_lunartique_mod(mod_zip, mod_zip.replace(".zip", ".carra"))
+            os.remove(mod_zip)
+            print("* Done")
+        except Exception as e:
+            print("* Error:", e)
+
+def extract_assets(mod_asset_root: str, mod_zips_root: str):
+    for mod_zip in glob.glob(f"{mod_zips_root}/*.carra"):
+        mod_zip = os.path.normpath(mod_zip)
         try:
             with ZipFile(mod_zip) as z:
                 for name in z.namelist():
@@ -85,12 +106,13 @@ atexit.register(cleanup_assets)
 signal.signal(signal.SIGINT, kill_handler)
 signal.signal(signal.SIGTERM, kill_handler)
 
+print("Detecting lunartique mods")
+detect_lunartique_mods(mod_zips_root_path)
 tmp_asset_root = tempfile.mkdtemp()
 print("Extracting mod assets to", tmp_asset_root)
-extract_assets(tmp_asset_root, "assets")
+extract_assets(tmp_asset_root, mod_zips_root_path)
 print("Backing up data and patching assets....")
 patch_assets(tmp_asset_root)
 shutil.rmtree(tmp_asset_root)
 print("Starting game")
-sleep(5)
-
+subprocess.call(sys.argv[1:])
