@@ -24,6 +24,10 @@ if len(sys.argv) < 2:
     print("Usage: main.py <game_path>")
     sys.exit(1)
 
+log_file = open(os.path.join(mod_zips_root_path, "log.txt"), "w", buffering=1)
+sys.stdout = log_file
+sys.stderr = log_file
+
 def bundle_data_paths():
     cache_path = os.path.join(appdata, "../LocalLow/Unity/ProjectMoon_LimbusCompany/*/*/")
     return map(os.path.normpath, glob.glob(cache_path))
