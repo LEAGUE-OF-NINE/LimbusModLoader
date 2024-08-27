@@ -99,7 +99,7 @@ def patch_assets(mod_asset_root: str):
                 obj.set_raw_data(f.read())
 
         with open(bundle_path, "wb") as f:
-            f.write(env.file.save())
+            f.write(env.file.save(packer="original"))
         print("* Patching complete", file_digest(new_path), "->", file_digest(bundle_path))
 
 def kill_handler(*args) -> None:
