@@ -1,131 +1,96 @@
+import atexit
 import glob
-import os
+import hashlib
+import os.path
+import shutil
+import sys
+import tempfile
+from pathlib import Path
+import signal
+from time import sleep
 from zipfile import ZipFile
 
 import UnityPy
-import hashlib
-import lzma
-import json
-import grequests
-import pickle
 
 limbus_root_path = "/Users/octeep/Library/Containers/com.isaacmarovitz.Whisky/Bottles/5A2D544D-6B2F-46D3-BF44-AF8DE2AE9764/drive_c/Program Files (x86)/Steam/steamapps/common/Limbus Company"
 app_data_root = "/Users/octeep/Library/Containers/com.isaacmarovitz.Whisky/Bottles/5A2D544D-6B2F-46D3-BF44-AF8DE2AE9764/drive_c/users/crossover/AppData"
-bundle_hashes_path = "bundle_hashes.pickle"
 
-bundle_reqs = []
-bundle_hashes = {}
-catalog_json_path = f"{limbus_root_path}/LimbusCompany_Data/StreamingAssets/aa/catalog.json"
+def bundle_data_paths():
+    return glob.glob(f"{app_data_root}/LocalLow/Unity/ProjectMoon_LimbusCompany/*/*/")
 
-def catalog_hash() -> str:
-    with open(catalog_json_path, "rb") as catalog:
-        return hashlib.md5(catalog.read()).hexdigest()
+def file_digest(file_path):
+    with open(file_path, "rb") as ff:
+        return hashlib.md5(ff.read()).hexdigest()
 
-if os.path.exists(bundle_hashes_path):
-    with open(bundle_hashes_path, "rb") as f:
-        saved_bundle_hashes = pickle.load(f)
-    try:
-        if saved_bundle_hashes["catalog"] == catalog_hash():
-            print("Bundle hashes are up to date, loading from file")
-            bundle_hashes = saved_bundle_hashes
-    except Exception as e:
-        bundle_hashes = {}
+def extract_assets(mod_asset_root: str, mod_zips_root: str):
+    for mod_zip in glob.glob(f"{mod_zips_root}/*.zip"):
+        try:
+            with ZipFile(mod_zip) as z:
+                for name in z.namelist():
+                    # Validate the path
+                    parts = name.split("/")
+                    if len(parts) != 3:
+                        raise Exception("Invalid path", name)
+                    if len(parts[0]) != 32 or len(parts[1]) != 32:
+                        raise Exception("Invalid path", name)
+                    int(parts[2])
+                print("Extracting", mod_zip)
+                z.extractall(mod_asset_root)
+        except Exception as e:
+            print("Error processing", mod_zip + ":", e)
 
-if bundle_hashes == {}:
-    print("Downloading bundle hashes")
-    with open(catalog_json_path, "rb") as f:
-        data = json.load(f)
-        for url in data["m_InternalIds"]:
-            if not (url.startswith("https://") and url.endswith(".bundle")):
-                continue
-            bundle_id = url.split("_")[-1].split(".")[0]
-            if len(bundle_id) != 32:
-                continue
-            bundle_reqs.append(grequests.head(url))
+def cleanup_assets():
+    print("Restoring data")
+    for bundle_root in bundle_data_paths():
+        bundle_path = os.path.join(bundle_root, "__data")
+        new_path = os.path.join(bundle_root, "__original")
+        if os.path.isfile(new_path):
+            print("Restoring", bundle_path)
+            shutil.move(new_path, bundle_path)
 
-    for resp in grequests.imap(bundle_reqs, size=16):
-        if "ETag" not in resp.headers:
+def patch_assets(mod_asset_root: str):
+    for bundle_root in bundle_data_paths():
+        # Move the original data to a new location temporarily
+        bundle_root_path = Path(bundle_root)
+        parts = [bundle_root_path.parent.name, bundle_root_path.name]
+        mod_path = os.path.join(mod_asset_root, *parts)
+        if not os.path.isdir(mod_path):
             continue
-        eTag = resp.headers["ETag"]
-        if eTag.startswith("\"") and eTag.endswith("\""):
-            eTag = eTag[1:-1]
-        if len(eTag) != 32:
-            continue
-        bundle_id = resp.url.split("_")[-1].split(".")[0]
-        bundle_hashes[bundle_id] = eTag
 
-    bundle_hashes["catalog"] = catalog_hash()
-    with open(bundle_hashes_path, "wb") as f:
-        pickle.dump(bundle_hashes, f)
+        bundle_path = os.path.join(bundle_root, "__data")
+        new_path = os.path.join(bundle_root, "__original")
 
-    print("Saved bundle hashes to file")
+        print("Backing up", bundle_path)
+        shutil.copy2(bundle_path, new_path)
 
-for bundle_path in glob.glob(f"{app_data_root}/LocalLow/Unity/ProjectMoon_LimbusCompany/*/*/__data"):
-    bundle_id = bundle_path.split("/")[-2]
-    if bundle_id not in bundle_hashes:
-        print(bundle_id, "not found in bundle hashes")
-    # print(bundle_id, bundle_path)
+        print("Patching", bundle_path)
+        env = UnityPy.load(bundle_path)
+        for obj in env.objects:
+            mod_part_path = os.path.join(mod_path, str(obj.path_id))
+            if not os.path.isfile(mod_part_path):
+                continue
+            print("- Loading", mod_part_path)
+            with open(mod_part_path, "rb") as f:
+                obj.set_raw_data(f.read())
 
-def scan_lunartique_mod_root(zip_file: ZipFile) -> str:
-    names = set()
-    root = None
-    for name in zip_file.namelist():
-        names.add(name)
-        if name.endswith("Assets/"):
-            root = name
-    if root is None:
-        raise Exception("Assets folder not found")
-    if f"{root}Uninstallation/" not in names:
-        raise Exception("Uninstallation folder not found")
-    if f"{root}Installation/" not in names:
-        raise Exception("Installation folder not found")
-    return root
+        with open(bundle_path, "wb") as f:
+            f.write(env.file.save())
+        print("* Patching complete", file_digest(new_path), "->", file_digest(bundle_path))
 
-def scan_lunartique_data(zip_path: ZipFile, data_folder: str) -> set[str]:
-    root = scan_lunartique_mod_root(zip_path)
-    names = set()
-    for name in zip_path.namelist():
-        if name.startswith(f"{root}{data_folder}/") and name.endswith("/__data"):
-            names.add(name)
-    return names
+def kill_handler(*args) -> None:
+    sys.exit(0)
 
-def compress_lunartique_mod(zip_path: str, output: str):
-    with ZipFile(zip_path, "r") as root:
-        vanilla_dict = {}
-        vanilla_paths = scan_lunartique_data(root, "Uninstallation")
-        if len(vanilla_paths) == 0:
-            raise Exception("No asset files found")
+cleanup_assets()
+atexit.register(cleanup_assets)
+signal.signal(signal.SIGINT, kill_handler)
+signal.signal(signal.SIGTERM, kill_handler)
 
-        for vanilla_path in vanilla_paths:
-            parts = vanilla_path.split("/")[-3:]
-            with root.open(vanilla_path, "r") as f:
-                env = UnityPy.load(f)
-
-                for obj in env.objects:
-                    data = obj.get_raw_data()
-                    parts[2] = str(obj.path_id)
-                    vanilla_dict["/".join(parts)] = hashlib.md5(data).digest()
-
-        compressor = lzma.LZMACompressor(preset=9)
-
-        with ZipFile(output, "w") as z:
-            for modded_path in map(lambda s: s.replace("Uninstallation", "Installation"), vanilla_paths):
-                parts = modded_path.split("/")[-3:]
-                with root.open(modded_path, "r") as f:
-                    env = UnityPy.load(f)
-
-                    for obj in env.objects:
-                        data = obj.get_raw_data()
-                        parts[2] = str(obj.path_id)
-                        key = "/".join(parts)
-                        if key not in vanilla_dict:
-                            print("New object found, ignored because new objects are currently unsupported", "/".join(parts))
-                            continue
-                        if vanilla_dict[key] == hashlib.md5(data).digest():
-                            continue
-                        with z.open(key, "w") as z_f:
-                            print("Writing", key)
-                            z_f.write(compressor.compress(data))
-
-compress_lunartique_mod("/Users/octeep/Downloads/sanging cairn.zip", "output.zip")
+tmp_asset_root = tempfile.mkdtemp()
+print("Extracting mod assets to", tmp_asset_root)
+extract_assets(tmp_asset_root, "assets")
+print("Backing up data and patching assets....")
+patch_assets(tmp_asset_root)
+shutil.rmtree(tmp_asset_root)
+print("Starting game")
+sleep(5)
 
