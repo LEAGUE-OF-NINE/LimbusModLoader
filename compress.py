@@ -5,6 +5,7 @@ from zipfile import ZipFile
 
 import UnityPy
 
+
 def scan_lunartique_mod_root(zip_file: ZipFile) -> str:
     names = set()
     root = None
@@ -20,6 +21,7 @@ def scan_lunartique_mod_root(zip_file: ZipFile) -> str:
         raise Exception("Installation folder not found")
     return root
 
+
 def scan_lunartique_data(zip_path: ZipFile, data_folder: str) -> set[str]:
     root = scan_lunartique_mod_root(zip_path)
     names = set()
@@ -27,6 +29,7 @@ def scan_lunartique_data(zip_path: ZipFile, data_folder: str) -> set[str]:
         if name.startswith(f"{root}{data_folder}/") and name.endswith("/__data"):
             names.add(name)
     return names
+
 
 def compress_lunartique_mod(zip_path: str, output: str):
     with ZipFile(zip_path, "r") as root:
@@ -56,11 +59,11 @@ def compress_lunartique_mod(zip_path: str, output: str):
                         parts[2] = str(obj.path_id)
                         key = "/".join(parts)
                         if key not in vanilla_dict:
-                            logging.info("* New object found, ignored because new objects are currently unsupported %s", "/".join(parts))
+                            logging.info("* New object found, ignored because new objects are currently unsupported %s",
+                                         "/".join(parts))
                             continue
                         if vanilla_dict[key] == hashlib.md5(data).digest():
                             continue
                         with z.open(key, "w") as z_f:
                             logging.info("* Writing %s", key)
                             z_f.write(lzma.compress(data, preset=9, format=lzma.FORMAT_XZ))
-

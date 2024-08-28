@@ -26,8 +26,10 @@ logging.basicConfig(
     ]
 )
 
+
 def kill_handler(*args) -> None:
     sys.exit(0)
+
 
 cleanup_assets()
 atexit.register(cleanup_assets)

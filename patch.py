@@ -56,6 +56,13 @@ def cleanup_assets(bundle_data=bundle_data_paths):
     for bundle_root in bundle_data():
         bundle_path = os.path.join(bundle_root, "__data")
         new_path = os.path.join(bundle_root, "__original")
+
+        env = UnityPy.load(bundle_path)
+        if env.file.version_player != "limbus_modded":
+            if os.path.isfile(new_path):
+                os.remove(new_path)
+            continue
+
         if os.path.isfile(new_path):
             logging.info("Restoring %s", bundle_path)
             shutil.move(new_path, bundle_path)
@@ -86,6 +93,7 @@ def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
             with open(mod_part_path, "rb") as f:
                 obj.set_raw_data(lzma.decompress(f.read(), format=lzma.FORMAT_XZ))
 
+        env.file.version_player = "limbus_modded"
         with open(bundle_path, "wb") as f:
-            f.write(env.file.save(packer="original"))
-        logging.info("* Patching complete %s -> %s", file_digest(new_path), file_digest(bundle_path))
+            f.write(env.file.save(packer="none"))
+        logging.info("* Patching complete %s (%d) -> %s (%d)", file_digest(new_path), os.path.getsize(new_path), file_digest(bundle_path), os.path.getsize(bundle_path))
