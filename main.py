@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 
+import gui
 from patch import *
 
 if appdata := os.getenv("APPDATA"):
@@ -14,8 +15,8 @@ else:
 os.makedirs(mod_zips_root_path, exist_ok=True)
 
 if len(sys.argv) < 2:
-    logging.info("Usage: main.py <game_path>")
-    sys.exit(1)
+    gui.__main__()
+    sys.exit(0)
 
 logging.basicConfig(
     level=logging.INFO,

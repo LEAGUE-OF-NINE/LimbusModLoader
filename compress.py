@@ -31,12 +31,14 @@ def scan_lunartique_data(zip_path: ZipFile, data_folder: str) -> set[str]:
     return names
 
 
-def compress_lunartique_mod(zip_path: str, output: str):
+def compress_lunartique_mod(zip_path: str, output: str, update_progress: lambda x: None):
     with ZipFile(zip_path, "r") as root:
         vanilla_dict = {}
         vanilla_paths = scan_lunartique_data(root, "Uninstallation")
         if len(vanilla_paths) == 0:
             raise Exception("No asset files found")
+
+        total_objects = 0
 
         for vanilla_path in vanilla_paths:
             parts = vanilla_path.split("/")[-3:]
@@ -47,6 +49,9 @@ def compress_lunartique_mod(zip_path: str, output: str):
                     data = obj.get_raw_data()
                     parts[2] = str(obj.path_id)
                     vanilla_dict["/".join(parts)] = hashlib.md5(data).digest()
+                    total_objects += 1
+
+        processed_objects = 0
 
         with ZipFile(output, "w") as z:
             for modded_path in map(lambda s: s.replace("Uninstallation", "Installation"), vanilla_paths):
@@ -55,6 +60,9 @@ def compress_lunartique_mod(zip_path: str, output: str):
                     env = UnityPy.load(f)
 
                     for obj in env.objects:
+                        processed_objects += 1
+                        update_progress(int(float(processed_objects) / total_objects * 100))
+
                         data = obj.get_raw_data()
                         parts[2] = str(obj.path_id)
                         key = "/".join(parts)
