@@ -56,11 +56,12 @@ def cleanup_assets(bundle_data=bundle_data_paths):
     for bundle_root in bundle_data():
         bundle_path = os.path.join(bundle_root, "__data")
         new_path = os.path.join(bundle_root, "__original")
+        if not os.path.isfile(new_path):
+            continue
 
         env = UnityPy.load(bundle_path)
         if env.file.version_player != "limbus_modded":
-            if os.path.isfile(new_path):
-                os.remove(new_path)
+            os.remove(new_path)
             continue
 
         if os.path.isfile(new_path):
