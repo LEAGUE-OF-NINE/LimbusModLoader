@@ -64,9 +64,8 @@ def cleanup_assets(bundle_data=bundle_data_paths):
             os.remove(new_path)
             continue
 
-        if os.path.isfile(new_path):
-            logging.info("Restoring %s", bundle_path)
-            shutil.move(new_path, bundle_path)
+        logging.info("Restoring %s", bundle_path)
+        shutil.move(new_path, bundle_path)
 
 
 def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
