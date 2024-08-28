@@ -2,10 +2,15 @@
 
 This is a mod loader for loading Limbus Company visual mods. 
 
+- You don't modify game files directly, so you kinda don't break limbus ToS
+- It can work with multiple mods changing same folder but different files
+- Saves space greatly, now you don't need to upload 2 GB to Google Drive, just upload a 3mb file on Discord instead
+- Mods persists after game updates (might require a restart after updating the game to load the mods)
+
 ## Discord Servers:
 - Limbus Company Modding Discord: https://discord.gg/T4kpeNcnnc
 
-Ping @zenocara for support.
+Ping @zenocara or @qifeetrying for support.
 
 ## Download
 Check the [release](https://github.com/LEAGUE-OF-NINE/LimbusModLoader/releases) page for the newest version, it is available as `build.zip`.
