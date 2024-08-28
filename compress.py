@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import lzma
 from zipfile import ZipFile
 
@@ -44,8 +45,6 @@ def compress_lunartique_mod(zip_path: str, output: str):
                     parts[2] = str(obj.path_id)
                     vanilla_dict["/".join(parts)] = hashlib.md5(data).digest()
 
-        compressor = lzma.LZMACompressor(preset=9)
-
         with ZipFile(output, "w") as z:
             for modded_path in map(lambda s: s.replace("Uninstallation", "Installation"), vanilla_paths):
                 parts = modded_path.split("/")[-3:]
@@ -57,11 +56,11 @@ def compress_lunartique_mod(zip_path: str, output: str):
                         parts[2] = str(obj.path_id)
                         key = "/".join(parts)
                         if key not in vanilla_dict:
-                            print("* New object found, ignored because new objects are currently unsupported", "/".join(parts))
+                            logging.info("* New object found, ignored because new objects are currently unsupported %s", "/".join(parts))
                             continue
                         if vanilla_dict[key] == hashlib.md5(data).digest():
                             continue
                         with z.open(key, "w") as z_f:
-                            print("* Writing", key)
-                            z_f.write(compressor.compress(data))
+                            logging.info("* Writing %s", key)
+                            z_f.write(lzma.compress(data, preset=9, format=lzma.FORMAT_XZ))
 
