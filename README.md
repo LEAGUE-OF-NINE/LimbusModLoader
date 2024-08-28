@@ -15,19 +15,49 @@ Ping @zenocara or @qifeetrying for support.
 ## Download
 Check the [release](https://github.com/LEAGUE-OF-NINE/LimbusModLoader/releases) page for the newest version, it is available as `build.zip`.
 
-## Installation
-Create a folder somewhere and download the modloader. Unzip the modloader in the new folder, it should create a `main.exe` and a folder `__internal`. 
+## Installing Mods for Limbus Company
 
-Right click Limbus Company on Steam, click Properties, and in General there should be a text field for specifying launch option. Put `"path to main.exe" %command%` in the launch option.
-For example, if your main.exe is at `C:\loader\main.exe`, put `"C:\loader\main.exe" %command%` in the launch option.
+This guide explains how to install mods for Limbus Company using a modloader.
 
+**1. Download and Prepare the Modloader:**
+
+- Download the `modloader.zip` file.
+- Extract the contents of the `modloader.zip` file into a new folder. This will create a `main.exe` file and a folder named `__internal`.
+
+**2. Configure Steam Launch Options:**
+
+- Right-click on Limbus Company in your Steam library.
+- Select "Properties".
+- Go to the "General" tab.
+- In the "Launch Options" field, enter the following: `"path to main.exe" %command%`
+  - Replace `"path to main.exe"` with the actual path to the `main.exe` file you extracted in step 1 (e.g., `"C:\loader\main.exe"`).
+  
 ![Example](./readme/steam_launch_option.png)
 
-Now launch Limbus Company, the game should start as usual. at `AppData/Roaming`(accessible via `%APPDATA%`) there should be a new folder `LimbusCompanyMods`, with a `log.txt` inside it. To install visual mods, you can put the mod files in `LimbusCompanyMods`.
+**3. Launch Limbus Company:**
 
-Currently, two types of mods are supported:
+- Launch Limbus Company through Steam.
+- The game should start normally.
 
-1. Lunartique format mods: Zip files containing installer and uninstaller scripts (`Installer.bat` and `Uninstaller.bat`). Simply put the zip files in the `LimbusCompanyMods` folder and it should load the mod upon launching (no need to unzip it!!).
-1. Carra format mods: `.carra` files, designed to be more compact and easily distributable.
+**4. Locate the Mods Folder:**
 
-Lunartique format mods will be converted to Carra format mods when launching the game. 
+- A new folder named `LimbusCompanyMods` will be created in your `AppData/Roaming` directory. This is where you'll install your mods.
+   - This folder can be found by pressing Windows key + R to launch the Run dialog window, and entering `%AppData%`
+   - Alternatively, try `C:\Users\user\AppData\Roaming\LimbusCompanyMods`
+
+
+**5. Install Mods:**
+
+- **Lunartique Format Mods:**
+  - These are zip files containing installer and uninstaller scripts (`Installer.bat` and `Uninstaller.bat`).
+  - Simply place the zip files directly into the `LimbusCompanyMods` folder.
+  - The mod will be automatically loaded upon launching the game. No need to unzip!
+- **Carra Format Mods:**
+   - These are `.carra` files.
+   - Place the `.carra` files directly into the `LimbusCompanyMods` folder.
+
+**Important Notes:**
+
+- Lunartique format mods will be converted to Carra format mods when launching the game. This compression can take a while.
+- This conversion is irreversible. If you are a mod maker, ensure you keep a copy of the original zipped file.
+
