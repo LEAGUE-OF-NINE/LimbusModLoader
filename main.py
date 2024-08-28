@@ -3,6 +3,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+from PyQt5 import sip
 
 import gui
 from patch import *
