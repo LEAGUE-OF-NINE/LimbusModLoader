@@ -7,6 +7,9 @@ This is a mod loader for loading Limbus Company visual mods.
 
 Ping @zenocara for support.
 
+## Download
+Check the [release](https://github.com/LEAGUE-OF-NINE/LimbusModLoader/releases) page for the newest version, it is available as `build.zip`.
+
 ## Installation
 Create a folder somewhere and download the modloader. Unzip the modloader in the new folder, it should create a `main.exe` and a folder `__internal`. 
 
