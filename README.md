@@ -13,6 +13,8 @@ Create a folder somewhere and download the modloader. Unzip the modloader in the
 Right click Limbus Company on Steam, click Properties, and in General there should be a text field for specifying launch option. Put `"path to main.exe" %command%` in the launch option.
 For example, if your main.exe is at `C:\loader\main.exe`, put `"C:\loader\main.exe" %command%` in the launch option.
 
+![Example](./readme/steam_launch_option.png)
+
 Now launch Limbus Company, the game should start as usual. at `%APPDATA%` there should be a new folder `LimbusCompanyMods`, with a `log.txt` inside it. To install visual mods, you can put the mod files in `LimbusCompanyMods`.
 
 Currently two types of mods are supported:
