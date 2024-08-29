@@ -38,6 +38,7 @@ This guide explains how to install mods for Limbus Company using a modloader.
 
 - Launch Limbus Company through Steam.
 - The game should start normally.
+- If you've installed visual mods before, you should clear cache once to uninstall all of them. Users have reported some mods not working and clearing cache once fixed it. This is only needed when you install the mod loader for the first time.
 
 **4. Locate the Mods Folder:**
 
