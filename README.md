@@ -21,16 +21,31 @@ This guide explains how to install mods for Limbus Company using a modloader.
 
 **1. Download and Prepare the Modloader:**
 
-- Download the `modloader.zip` file.
-- Extract the contents of the `modloader.zip` file into a new folder. This will create a `main.exe` file and a folder named `__internal`.
+**Windows:**
+- Download the `build.zip` file from [releases](https://github.com/LEAGUE-OF-NINE/LimbusModLoader/releases).
+- Extract the contents of the `build.zip` file into a new folder. This will create a `main.exe` file and a folder named `__internal`.
+
+**Linux:**
+- Download and unzip the source code zip file from [releases](https://github.com/LEAGUE-OF-NINE/LimbusModLoader/releases). Alternatively, git clone the project, and checkout to the latest tag.
+- In the project, run `python3 -m venv venv` to create a virtual environment.
+- Run `source venv/bin/activate` to activate the virtual environment, you should see `(venv)` in your terminal.
+- Run `pip install -r requirements.txt` to install the required packages.
 
 **2. Configure Steam Launch Options:**
 
 - Right-click on Limbus Company in your Steam library.
 - Select "Properties".
 - Go to the "General" tab.
+
+**Windows:**
+
 - In the "Launch Options" field, enter the following: `"path to main.exe" %command%`
   - Replace `"path to main.exe"` with the actual path to the `main.exe` file you extracted in step 1 (e.g., `"C:\loader\main.exe"`).
+
+**Linux:**
+- In the "Launch Options" field, enter the following: `APPDATA=/home/user/..../.steam/.../AppData/Roaming /path/to/the/repo/venv/bin/python3 /path/to/the/repo/main.py %command%`
+  - Replace `/home/user/..../.steam/.../AppData/Roaming` with the actual path to your Limbus AppData directory.
+  - You can locate this by doing `cd ~/.steam/steam` and then `find . | grep Roaming`. Note there might be multiple directories, you need to find the one with `LimbusCompany` in it.
   
 ![Example](./readme/steam_launch_option.png)
 
