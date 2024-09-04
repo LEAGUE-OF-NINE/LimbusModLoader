@@ -75,7 +75,7 @@ def cleanup_assets(bundle_data=bundle_data_paths):
             logging.info("Corrupted file detected %s: %s", bundle_path, e)
 
         logging.info("Restoring %s", bundle_path)
-        os.rename(new_path, bundle_path)
+        os.replace(new_path, bundle_path)
 
 
 def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
