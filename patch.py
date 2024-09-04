@@ -32,8 +32,15 @@ def detect_lunartique_mods(mod_zips_root: str):
             logging.info("* Error: %s", e)
 
 
+def mod_file_size(file):
+    try:
+        return os.path.getsize(file)
+    except:
+        return 1 << 64
+
+
 def extract_assets(mod_asset_root: str, mod_zips_root: str):
-    for mod_zip in glob.glob(f"{mod_zips_root}/*.carra"):
+    for mod_zip in sorted(glob.glob(f"{mod_zips_root}/*.carra"), key=mod_file_size, reverse=True):
         mod_zip = os.path.normpath(mod_zip)
         try:
             with ZipFile(mod_zip) as z:
@@ -99,4 +106,5 @@ def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
         env.file.version_player = "limbus_modded"
         with open(bundle_path, "wb") as f:
             f.write(env.file.save(packer="none"))
-        logging.info("* Patching complete %s (%d) -> %s (%d)", file_digest(new_path), os.path.getsize(new_path), file_digest(bundle_path), os.path.getsize(bundle_path))
+        logging.info("* Patching complete %s (%d) -> %s (%d)", file_digest(new_path), os.path.getsize(new_path),
+                     file_digest(bundle_path), os.path.getsize(bundle_path))
