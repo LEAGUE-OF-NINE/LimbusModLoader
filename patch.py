@@ -91,7 +91,7 @@ def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
         new_path = os.path.join(bundle_root, "__original")
 
         logging.info("Backing up %s", bundle_path)
-        os.rename(bundle_path, new_path)
+        os.replace(bundle_path, new_path)
 
         logging.info("Patching %s", bundle_path)
         env = UnityPy.load(new_path)
