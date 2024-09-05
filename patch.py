@@ -57,6 +57,11 @@ def extract_assets(mod_asset_root: str, mod_zips_root: str):
         except Exception as e:
             logging.info("Error processing %s: %s", mod_zip, e)
 
+    for mod_carra in glob.glob(f"{mod_asset_root}/*/*/*"):
+        mod_carra_path = Path(mod_carra)
+        new_mod_carra = os.path.join(mod_carra_path.parent.parent, mod_carra_path.name)
+        os.replace(mod_carra, new_mod_carra)
+
 
 def cleanup_assets(bundle_data=bundle_data_paths):
     logging.info("Restoring data")
@@ -82,8 +87,7 @@ def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
     for bundle_root in bundle_data():
         # Move the original data to a new location temporarily
         bundle_root_path = Path(bundle_root)
-        parts = [bundle_root_path.parent.name, bundle_root_path.name]
-        mod_path = os.path.join(mod_asset_root, *parts)
+        mod_path = os.path.join(mod_asset_root, bundle_root_path.parent.name)
         if not os.path.isdir(mod_path):
             continue
 
