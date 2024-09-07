@@ -21,6 +21,7 @@ jobs:
       #   with:
       #     path: .
       - uses: actions/setup-python@v2
+        id: python
         with:
             python-version: '3.12'
 

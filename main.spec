@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('c:/python310/lib/site-packages/UnityPy/resources/uncompressed.tpk', 'UnityPy/resources')],
+    datas=[('UnityPy/resources/uncompressed.tpk', 'UnityPy/resources')],
     hiddenimports=['pkg_resources.extern'],
     hookspath=[],
     hooksconfig={},
