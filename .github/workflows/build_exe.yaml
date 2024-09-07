@@ -44,7 +44,7 @@ jobs:
           pip install -r requirements.txt
       - name: Build Executable
         run: |
-          pyinstaller --clean -y --dist ./dist/windows --workpath assets/ --icon assets/icon.png main.spec
+          pyinstaller --clean -y --dist ./dist/windows main.spec
       - uses: actions/upload-artifact@v2
         with:
           name: Build (windows)
