@@ -1,5 +1,5 @@
 Brotli==1.1.0
-etcpak==0.9.9
+etcpak==0.9.8
 fsspec==2024.9.0
 lz4==4.3.3
 packaging==24.1
