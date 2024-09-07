@@ -3,7 +3,7 @@
 import os
 from PyInstaller.utils.hooks import get_package_paths
 
-_unity_py = os.path.join(get_package_paths('UnityPy'), 'resources/uncompressed.tpk')
+_unity_py = os.path.join(get_package_paths('UnityPy')[1], 'resources/uncompressed.tpk')
 
 a = Analysis(
     ['main.py'],
