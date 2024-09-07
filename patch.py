@@ -1,5 +1,5 @@
 import glob
-import hashlib
+import xxhash
 import lzma
 import os.path
 import shutil
@@ -18,7 +18,11 @@ def bundle_data_paths(appdata: str = os.getenv("APPDATA")):
 
 def file_digest(file_path):
     with open(file_path, "rb") as ff:
-        return hashlib.md5(ff.read()).hexdigest()
+        xxdigest = xxhash.xxh128()
+        while chunk := ff.read(8192):
+            xxdigest.update(chunk)
+
+        return xxdigest.hexdigest()
 
 
 def detect_lunartique_mods(mod_zips_root: str):
