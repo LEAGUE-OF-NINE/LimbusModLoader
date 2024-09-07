@@ -26,6 +26,8 @@ logging.basicConfig(
     ]
 )
 
+logging.info("Limbus Mod Loader version: v1.6")
+
 
 def kill_handler(*args) -> None:
     sys.exit(0)
