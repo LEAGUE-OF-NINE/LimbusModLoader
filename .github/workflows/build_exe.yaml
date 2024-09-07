@@ -43,14 +43,14 @@ jobs:
       - name: Build Executable
         run: |
           pyinstaller --clean -y --dist ./dist/windows main.spec
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Build (windows)
-          path: dist/windows
       - name: Zip Build Directory
         run: |
           cd dist/windows
-          zip -r ../../build.zip .
+          Compress-Archive -Path . -DestinationPath ../../build.zip -Force
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Build (windows)
+          path: build.zip
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
         id: create_release
