@@ -10,14 +10,18 @@ def scan_lunartique_mod_root(zip_file: ZipFile) -> str:
     names = set()
     root = None
     for name in zip_file.namelist():
-        names.add(name)
-        if name.endswith("Assets/"):
-            root = name
+        name_parts = name.split("/")
+        while name_parts:
+            name_part = "/".join(name_parts)
+            names.add(name_part)
+            name_parts.pop()
+            if name_part.endswith("/Assets"):
+                root = name_part
     if root is None:
         raise Exception("Assets folder not found")
-    if f"{root}Uninstallation/" not in names:
+    if f"{root}/Uninstallation" not in names:
         raise Exception("Uninstallation folder not found")
-    if f"{root}Installation/" not in names:
+    if f"{root}/Installation" not in names:
         raise Exception("Installation folder not found")
     return root
 
@@ -26,7 +30,7 @@ def scan_lunartique_data(zip_path: ZipFile, data_folder: str) -> set[str]:
     root = scan_lunartique_mod_root(zip_path)
     names = set()
     for name in zip_path.namelist():
-        if name.startswith(f"{root}{data_folder}/") and name.endswith("/__data"):
+        if name.startswith(f"{root}/{data_folder}/") and name.endswith("/__data"):
             names.add(name)
     return names
 
