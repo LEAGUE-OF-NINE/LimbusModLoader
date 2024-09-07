@@ -45,12 +45,10 @@ jobs:
       - name: Build Executable
         run: |
           pyinstaller main.py
-          
-
       - uses: actions/upload-artifact@v2
         with:
           name: Build (windows)
-          path: dist/windows
+          path: build/main
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
         id: create_release
