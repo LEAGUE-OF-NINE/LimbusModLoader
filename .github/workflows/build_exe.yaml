@@ -33,7 +33,7 @@ jobs:
           path: pyinstaller
       - name: Build Pyinstaller
         run: |
-          cd $GITHUB_WORKSPACE\pyinstaller\bootloader
+          cd .\pyinstaller\bootloader
           python .\waf all
           cd ..
           pip install -e .
