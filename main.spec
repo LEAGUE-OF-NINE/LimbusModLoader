@@ -1,11 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
+from PyInstaller.utils.hooks import get_package_paths
+
+_unity_py = os.path.join(get_package_paths('UnityPy'), 'resources/uncompressed.tpk')
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('UnityPy/resources/uncompressed.tpk', 'UnityPy/resources')],
+    datas=[(_unity_py, 'UnityPy/resources')],
     hiddenimports=['pkg_resources.extern'],
     hookspath=[],
     hooksconfig={},
