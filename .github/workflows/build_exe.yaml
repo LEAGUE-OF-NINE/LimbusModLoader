@@ -25,13 +25,13 @@ jobs:
             python-version: ${{ env.PYTHON_VERSION }}
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.20.0'
+          go-version: '1.20.14'
       - run: go version
 
       # Build Executable
       - name: Build Bootloader
         run: |
-          go build -o ../main.exe bootloader/main.go
+          GOOS=windows GOARCH=amd64 go build -o ../main.exe bootloader/main.go
       - name: Install Dependencies
         run: |
           python -m venv venv
