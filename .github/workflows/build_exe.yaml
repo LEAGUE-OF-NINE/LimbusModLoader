@@ -39,7 +39,7 @@ jobs:
       - name: Zip Build Directory
         run: |
           cd ..
-          Move-Item LimbusModLoader _internal
+          Copy-Item -Path "LimbusModLoader" -Destination "_internal" -Recurse
           Compress-Archive -Path _internal -DestinationPath build.zip -Force
       - uses: actions/upload-artifact@v2
         with:
