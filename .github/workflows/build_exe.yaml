@@ -11,6 +11,9 @@ on:
 permissions:
   contents: write
 
+env:
+  PYTHON_VERSION: 3.12.6
+
 jobs:
   build:
     runs-on: windows-latest
@@ -19,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v2
         id: python
         with:
-            python-version: '3.12'
+            python-version: ${{ env.PYTHON_VERSION }}
 
       # Build Executable
       - name: Install Dependencies
@@ -27,6 +30,12 @@ jobs:
           python -m venv venv
           .\venv\Scripts\activate
           pip install -r requirements.txt
+      - name: Install Embedded Python
+        run: |
+          Invoke-WebRequest -Uri https://www.python.org/ftp/python/${{ env.PYTHON_VERSION }}/python-${{ env.PYTHON_VERSION }}-embed-amd64.zip -OutFile ../python.zip
+          New-Item -ItemType Directory -Path venv/Bins
+          Expand-Archive -Path ../python.zip -DestinationPath venv/Bins
+          Add-Content -Path venv/Bins/*._pth -Value "import site"
       - name: Zip Build Directory
         run: |
           Compress-Archive -Path . -DestinationPath build.zip -Force

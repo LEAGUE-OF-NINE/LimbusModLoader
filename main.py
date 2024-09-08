@@ -4,6 +4,12 @@ import subprocess
 import sys
 import tempfile
 
+# Needed for embedded python
+import os
+
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
+
 from patch import *
 
 if appdata := os.getenv("APPDATA"):
