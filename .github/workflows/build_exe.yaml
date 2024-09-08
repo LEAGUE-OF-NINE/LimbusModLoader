@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 env:
-  PYTHON_VERSION: 3.12.6
+  PYTHON_VERSION: 3.9.6
 
 jobs:
   build:
