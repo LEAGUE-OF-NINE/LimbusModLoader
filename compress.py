@@ -3,27 +3,23 @@ import lzma
 from zipfile import ZipFile
 
 import UnityPy
-from xxhash import xxh128, xxh128_digest
+from xxhash import xxh128
 
 
 def scan_lunartique_mod_root(zip_file: ZipFile) -> str:
     names = set()
-    root = None
     for name in zip_file.namelist():
         name_parts = name.split("/")
         while name_parts:
             name_part = "/".join(name_parts)
             names.add(name_part)
             name_parts.pop()
-            if name_part.endswith("/Assets"):
-                root = name_part
-    if root is None:
-        raise Exception("Assets folder not found")
-    if f"{root}/Uninstallation" not in names:
-        raise Exception("Uninstallation folder not found")
-    if f"{root}/Installation" not in names:
-        raise Exception("Installation folder not found")
-    return root
+
+    for root in names:
+        if f"{root}/Uninstallation" in names and f"{root}/Installation" in names:
+            return root
+
+    raise Exception("Root folder for installation folder and uninstallation folder not found")
 
 
 def scan_lunartique_data(zip_path: ZipFile, data_folder: str) -> set[str]:
