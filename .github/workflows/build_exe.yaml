@@ -19,8 +19,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          path: _internal
       - uses: actions/setup-python@v2
         id: python
         with:
@@ -40,7 +38,9 @@ jobs:
           Add-Content -Path venv/Bins/*._pth -Value "import site"
       - name: Zip Build Directory
         run: |
-          Compress-Archive -Path . -DestinationPath build.zip -Force
+          cd ..
+          Move-Item LimbusModLoader _internal
+          Compress-Archive -Path _internal -DestinationPath build.zip -Force
       - uses: actions/upload-artifact@v2
         with:
           name: Build (windows)
