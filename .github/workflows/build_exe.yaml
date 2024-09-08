@@ -40,11 +40,11 @@ jobs:
         run: |
           cd ..
           Copy-Item -Path "LimbusModLoader" -Destination "_internal" -Recurse
-          Compress-Archive -Path _internal -DestinationPath build.zip -Force
+          Compress-Archive -Path _internal -DestinationPath LimbusModLoader\build.zip -Force
       - uses: actions/upload-artifact@v2
         with:
           name: Build (windows)
-          path: ../build.zip
+          path: build.zip
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
         id: create_release
@@ -63,6 +63,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ../build.zip
+          asset_path: build.zip
           asset_name: build.zip
           asset_content_type: application/zip
