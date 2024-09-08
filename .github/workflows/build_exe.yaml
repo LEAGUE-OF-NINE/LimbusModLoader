@@ -31,7 +31,9 @@ jobs:
       # Build Executable
       - name: Build Bootloader
         run: |
-          GOOS=windows GOARCH=amd64 go build -o ../main.exe bootloader/main.go
+          set GOOS=windows
+          set GOARCH=amd64
+          go build -o ../main.exe bootloader/main.go
       - name: Install Dependencies
         run: |
           python -m venv venv
