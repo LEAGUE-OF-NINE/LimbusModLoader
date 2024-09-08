@@ -21,32 +21,15 @@ jobs:
         with:
             python-version: '3.12'
 
-      # Setup PyInstaller
-      - name: Checkout Pyinstaller
-        uses: actions/checkout@v2
-        with:
-          repository: pyinstaller/pyinstaller
-          ref: v6.10.0
-          path: pyinstaller
-      - name: Build Pyinstaller
-        run: |
-          cd .\pyinstaller\bootloader
-          python .\waf all
-          cd ..
-          pip install -e .
-
       # Build Executable
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m venv venv
+          .\venv\Scripts\activate
           pip install -r requirements.txt
-      - name: Build Executable
-        run: |
-          pyinstaller --clean -y --dist ./dist/windows main.spec
       - name: Zip Build Directory
         run: |
-          cd dist/windows
-          Compress-Archive -Path . -DestinationPath ../../build.zip -Force
+          Compress-Archive -Path . -DestinationPath build.zip -Force
       - uses: actions/upload-artifact@v2
         with:
           name: Build (windows)
