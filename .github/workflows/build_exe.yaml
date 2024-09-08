@@ -26,7 +26,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.20.14'
-      - run: go version
+      - run: |
+          go version
+          go install github.com/tc-hib/go-winres@latest
 
       # Build Executable
       - name: Build Bootloader
@@ -34,6 +36,7 @@ jobs:
           set GOOS=windows
           set GOARCH=amd64
           go build -o ../main.exe bootloader/main.go
+          go-winres patch -in bootloader/winres/winres.json ../main.exe
       - name: Install Dependencies
         run: |
           python -m venv venv
