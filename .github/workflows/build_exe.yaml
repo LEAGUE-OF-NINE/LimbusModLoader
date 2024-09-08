@@ -23,8 +23,15 @@ jobs:
         id: python
         with:
             python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/setup-go@v5
+      - with:
+          go-version: '1.20.0'
+      - run: go version
 
       # Build Executable
+      - name: Build Bootloader
+        run: |
+          go build -o ../main.exe bootloader/main.go
       - name: Install Dependencies
         run: |
           python -m venv venv
@@ -40,7 +47,7 @@ jobs:
         run: |
           cd ..
           Copy-Item -Path "LimbusModLoader" -Destination "_internal" -Recurse
-          Compress-Archive -Path _internal -DestinationPath LimbusModLoader\build.zip -Force
+          Compress-Archive -Path "_internal", "main.exe" -DestinationPath LimbusModLoader\build.zip -Force
       - uses: actions/upload-artifact@v2
         with:
           name: Build (windows)
