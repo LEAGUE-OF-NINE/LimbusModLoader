@@ -97,7 +97,7 @@ def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
 
         bundle_path = os.path.join(bundle_root, "__data")
         new_path = os.path.join(bundle_root, "__original")
-
+        os.chmod(bundle_path, 0o777)
         logging.info("Backing up %s", bundle_path)
         os.replace(bundle_path, new_path)
 
