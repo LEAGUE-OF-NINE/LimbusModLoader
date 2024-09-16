@@ -10,7 +10,7 @@ This is a mod loader for loading Limbus Company visual mods.
 ## Discord Servers:
 - Limbus Company Modding Discord: https://discord.gg/T4kpeNcnnc
 
-Ping @zenocara or @qifeetrying for support.
+Ping @myssal, @zenocara or @qifeetrying for support.
 
 ## Download
 Check the [release](https://github.com/LEAGUE-OF-NINE/LimbusModLoader/releases) page for the newest version, it is available as `build.zip`.
