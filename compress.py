@@ -44,9 +44,11 @@ def compress_lunartique_mod(zip_path: str, output: str):
                 env = UnityPy.load(f)
 
                 for obj in env.objects:
-                    data = obj.get_raw_data()
-                    parts[2] = str(obj.path_id)
-                    vanilla_dict["/".join(parts)] = xxh128(data).digest()
+                    # skip unnecessary assets
+                    if obj.type.name in ["Texture2D", "Sprite", "TextAsset"]:
+                        data = obj.get_raw_data()
+                        parts[2] = str(obj.path_id)
+                        vanilla_dict["/".join(parts)] = xxh128(data).digest()
 
         with ZipFile(output, "w") as z:
             for modded_path in map(lambda s: s.replace("Uninstallation", "Installation"), vanilla_paths):
@@ -55,15 +57,16 @@ def compress_lunartique_mod(zip_path: str, output: str):
                     env = UnityPy.load(f)
 
                     for obj in env.objects:
-                        data = obj.get_raw_data()
-                        parts[2] = str(obj.path_id)
-                        key = "/".join(parts)
-                        if key not in vanilla_dict:
-                            logging.info("* New object found, ignored because new objects are currently unsupported %s",
-                                         "/".join(parts))
-                            continue
-                        if vanilla_dict[key] == xxh128(data).digest():
-                            continue
-                        with z.open(key, "w") as z_f:
-                            logging.info("* Writing %s", key)
-                            z_f.write(lzma.compress(data, preset=9, format=lzma.FORMAT_XZ))
+                        if obj.type.name in ["Texture2D", "Sprite", "TextAsset"]:
+                            data = obj.get_raw_data()
+                            parts[2] = str(obj.path_id)
+                            key = "/".join(parts)
+                            if key not in vanilla_dict:
+                                logging.info("* New object found, ignored because new objects are currently unsupported %s",
+                                             "/".join(parts))
+                                continue
+                            if vanilla_dict[key] == xxh128(data).digest():
+                                continue
+                            with z.open(key, "w") as z_f:
+                                logging.info("* Writing %s", key)
+                                z_f.write(lzma.compress(data, preset=9, format=lzma.FORMAT_XZ))
