@@ -7,10 +7,13 @@ import tempfile
 # Needed for embedded python
 import os
 
+import logging
+
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
-from patch import *
+import patch
+import sound
 
 if appdata := os.getenv("APPDATA"):
     mod_zips_root_path = os.path.join(appdata, "LimbusCompanyMods")
@@ -39,6 +42,14 @@ def kill_handler(*args) -> None:
     sys.exit(0)
 
 
+def cleanup_assets():
+    try:
+        logging.info("Cleaning up assets")
+        patch.cleanup_assets()
+        sound.restore_sound()
+    except Exception as e:
+        logging.error("Error: %s", e)
+
 try:
     logging.info("Limbus args: %s", sys.argv)
     cleanup_assets()
@@ -47,13 +58,14 @@ try:
     signal.signal(signal.SIGTERM, kill_handler)
 
     logging.info("Detecting lunartique mods")
-    detect_lunartique_mods(mod_zips_root_path)
+    patch.detect_lunartique_mods(mod_zips_root_path)
     tmp_asset_root = tempfile.mkdtemp()
     logging.info("Extracting mod assets to %s", tmp_asset_root)
-    extract_assets(tmp_asset_root, mod_zips_root_path)
+    patch.extract_assets(tmp_asset_root, mod_zips_root_path)
     logging.info("Backing up data and patching assets....")
-    patch_assets(tmp_asset_root)
-    shutil.rmtree(tmp_asset_root)
+    patch.patch_assets(tmp_asset_root)
+    patch.shutil.rmtree(tmp_asset_root)
+    sound.replace_sound(mod_zips_root_path)
     logging.info("Starting game")
     subprocess.call(sys.argv[1:])
 except Exception as e:
