@@ -6,15 +6,14 @@ import tempfile
 
 # Needed for embedded python
 import os
-from sys import excepthook
 
-import sound
 import logging
-import patch
 
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
+import patch
+import sound
 
 if appdata := os.getenv("APPDATA"):
     mod_zips_root_path = os.path.join(appdata, "LimbusCompanyMods")
