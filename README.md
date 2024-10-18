@@ -71,6 +71,10 @@ This guide explains how to install mods for Limbus Company using a modloader.
 - **Carra Format Mods:**
    - These are `.carra` files.
    - Place the `.carra` files directly into the `LimbusCompanyMods` folder.
+- **Sound Mods:**
+   - These are `.bank` files.
+   - Place the `.bank` files directly into the `LimbusCompanyMods` folder.
+   - Note that you can't use 2 different modded version of a `.bank` at the same time.
 
 **Important Notes:**
 
