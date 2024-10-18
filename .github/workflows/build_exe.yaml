@@ -53,7 +53,7 @@ jobs:
           cd ..
           Copy-Item -Path "LimbusModLoader" -Destination "_internal" -Recurse
           Compress-Archive -Path "_internal", "main.exe" -DestinationPath LimbusModLoader\build.zip -Force
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: Build (windows)
           path: build.zip
