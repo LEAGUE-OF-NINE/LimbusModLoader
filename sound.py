@@ -1,6 +1,7 @@
 import glob
 import logging
 import os
+import shutil
 import time
 from threading import Thread
 
@@ -29,7 +30,7 @@ def sound_replace_thread(mod_folder: str):
         logging.info("Replacing %s", sound_file)
         target = os.path.join(target_folder, os.path.basename(sound_file))
         os.replace(target, target + ".bak")
-        os.replace(sound_file, target)
+        shutil.copyfile(sound_file, target)
 
 def restore_sound():
     target_folder = sound_folder()
