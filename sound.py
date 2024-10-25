@@ -42,7 +42,7 @@ def restore_sound():
 
 def replace_sound(mod_folder: str):
     mod_zips_root_path = get_mod_folder()
-    if not any(file_name.endswith(".bank") for file_name in os.listdir(mod_zips_root_path)):
+    if any(file_name.endswith(".bank") for file_name in os.listdir(mod_zips_root_path)):
         Thread(target=sound_replace_thread, args=(mod_folder,)).start()
     else:
         logging.info("No .bank found, skip sound replacing process.")
