@@ -9,18 +9,19 @@ import os
 
 import logging
 
+from modfolder import get_mod_folder
+
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
 import patch
 import sound
 
-if appdata := os.getenv("APPDATA"):
-    mod_zips_root_path = os.path.join(appdata, "LimbusCompanyMods")
-else:
-    raise Exception("APPDATA not found")
 
+
+mod_zips_root_path = get_mod_folder()
 os.makedirs(mod_zips_root_path, exist_ok=True)
+
 
 if len(sys.argv) < 2:
     logging.info("Usage: main.py <game_path>")

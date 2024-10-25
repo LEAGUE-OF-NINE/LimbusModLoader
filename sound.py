@@ -5,6 +5,8 @@ import shutil
 import time
 from threading import Thread
 
+from modfolder import get_mod_folder
+
 
 def sound_folder(appdata: str = os.getenv("APPDATA")):
     return os.path.join(appdata, "../LocalLow/ProjectMoon/LimbusCompany/Assets/Sound/FMODBuilds/Desktop")
@@ -39,4 +41,8 @@ def restore_sound():
         os.replace(sound_file, target)
 
 def replace_sound(mod_folder: str):
-    Thread(target=sound_replace_thread, args=(mod_folder,)).start()
+    mod_zips_root_path = get_mod_folder()
+    if not any(file_name.endswith(".bank") for file_name in os.listdir(mod_zips_root_path)):
+        Thread(target=sound_replace_thread, args=(mod_folder,)).start()
+    else:
+        logging.info("No .bank found, skip sound replacing process.")
