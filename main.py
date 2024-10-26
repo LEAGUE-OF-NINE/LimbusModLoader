@@ -9,15 +9,13 @@ import os
 
 import logging
 
-from modfolder import get_mod_folder
-
+# DO NOT IMPORT ANY FILES BEFORE THESE TWO LINES
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
+from modfolder import get_mod_folder
 import patch
 import sound
-
-
 
 mod_zips_root_path = get_mod_folder()
 os.makedirs(mod_zips_root_path, exist_ok=True)
@@ -36,7 +34,7 @@ logging.basicConfig(
     ]
 )
 
-logging.info("Limbus Mod Loader version: v1.6")
+logging.info("Limbus Mod Loader version: v1.7.2")
 
 
 def kill_handler(*args) -> None:
