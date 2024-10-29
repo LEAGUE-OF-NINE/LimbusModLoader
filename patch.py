@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 from zipfile import ZipFile
 
-from UnityPy.files import SerializedFile, BundleFile
+from UnityPy.files import SerializedFile, BundleFile, ObjectReader
 
 from compress import compress_lunartique_mod
 
@@ -32,7 +32,7 @@ def detect_lunartique_mods(mod_zips_root: str):
     for mod_zip in glob.glob(f"{mod_zips_root}/*.zip"):
         logging.info("Compressing lunartique format mod (might take a while!): %s", mod_zip)
         try:
-            compress_lunartique_mod(mod_zip, mod_zip.replace(".zip", ".carra"))
+            compress_lunartique_mod(mod_zip, mod_zip.replace(".zip", ".carra2"))
             os.remove(mod_zip)
             logging.info("* Done")
         except Exception as e:
@@ -47,18 +47,10 @@ def mod_file_size(file):
 
 
 def extract_assets(mod_asset_root: str, mod_zips_root: str):
-    for mod_zip in sorted(glob.glob(f"{mod_zips_root}/*.carra"), key=mod_file_size, reverse=True):
+    for mod_zip in sorted(glob.glob(f"{mod_zips_root}/*.carra*"), key=mod_file_size, reverse=True):
         mod_zip = os.path.normpath(mod_zip)
         try:
             with ZipFile(mod_zip) as z:
-                for name in z.namelist():
-                    # Validate the path
-                    parts = name.split("/")
-                    if len(parts) != 3:
-                        raise Exception("Invalid path", name)
-                    if len(parts[0]) != 32 or len(parts[1]) != 32:
-                        raise Exception("Invalid path", name)
-                    int(parts[2])
                 logging.info("Extracting %s", mod_zip)
                 z.extractall(mod_asset_root)
         except Exception as e:
@@ -93,17 +85,17 @@ def cleanup_assets(bundle_data=bundle_data_paths):
 def patch_bundle_asset(env: UnityPy.Environment, mod_path: str):
     for f in env.file.files.values():
         if not isinstance(f, SerializedFile):
-            logging.info("The file is not a serialized file but is a %s instead?? Skipped", type(f))
+            logging.info("Expected serialized file but got a %s instead?? Skipped", type(f))
             return
 
         objects = f.objects
         for modded_asset in os.listdir(mod_path):
             try:
-                path_id = int(modded_asset)
+                path_id = int(modded_asset.split(".")[0])
             except ValueError:
                 continue
 
-            mod_part_path = os.path.join(mod_path, str(path_id))
+            mod_part_path = os.path.join(mod_path, modded_asset)
             if not os.path.isfile(mod_part_path):
                 continue
             if obj := objects.get(path_id):

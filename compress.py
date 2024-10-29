@@ -62,6 +62,7 @@ def compress_lunartique_mod(zip_path: str, output: str):
                             continue
                         if key not in vanilla_dict:
                             logging.info("* New object found: %s","/".join(parts))
+                        key += f".{obj.type_id}"
                         with z.open(key, "w") as z_f:
                             logging.info("* Writing %s", key)
                             z_f.write(lzma.compress(data, preset=9, format=lzma.FORMAT_XZ))
