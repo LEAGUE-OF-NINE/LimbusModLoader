@@ -8,6 +8,7 @@ from pathlib import Path
 from zipfile import ZipFile
 
 from UnityPy.files import SerializedFile, BundleFile, ObjectReader
+from UnityPy.streams import EndianBinaryReader
 
 from compress import compress_lunartique_mod
 
@@ -91,7 +92,11 @@ def patch_bundle_asset(env: UnityPy.Environment, mod_path: str):
         objects = f.objects
         for modded_asset in os.listdir(mod_path):
             try:
-                path_id = int(modded_asset.split(".")[0])
+                name = modded_asset.split(".")
+                path_id = int(name[0])
+                type_id = -1
+                if len(name) > 1:
+                    type_id = int(name[1])
             except ValueError:
                 continue
 
@@ -99,11 +104,24 @@ def patch_bundle_asset(env: UnityPy.Environment, mod_path: str):
             if not os.path.isfile(mod_part_path):
                 continue
             if obj := objects.get(path_id):
+                if not isinstance(obj, ObjectReader):
+                    logging.error("- Object is not ObjectReader, wtf?")
+                    continue
                 logging.info("- Loading %s", mod_part_path)
+                if type_id > 0 and type_id != obj.type_id:
+                    logging.info("- Mismatching asset type, vanilla: %d, modded: %d, skipped", obj.type_id, type_id)
+                    continue
                 with open(mod_part_path, "rb") as mf:
                     obj.set_raw_data(lzma.decompress(mf.read(), format=lzma.FORMAT_XZ))
-            else:
-                logging.info("- Detected unused mod asset: %s", mod_part_path)
+            elif type_id > 0:
+                logging.info("- Adding unused mod asset of type %d: %s", type_id, mod_part_path)
+                reader = EndianBinaryReader(bytes(bytearray(1024)))
+                obj = ObjectReader(assets_file=f, reader=reader)
+                obj.path_id = path_id
+                obj.type_id = type_id
+                with open(mod_part_path, "rb") as mf:
+                    obj.set_raw_data(lzma.decompress(mf.read(), format=lzma.FORMAT_XZ))
+                objects[path_id] = obj
 
 
 def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
