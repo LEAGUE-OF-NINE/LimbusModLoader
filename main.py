@@ -3,6 +3,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import pathlib
 
 # Needed for embedded python
 import os
@@ -49,6 +50,23 @@ def cleanup_assets():
     except Exception as e:
         logging.error("Error: %s", e)
 
+limbus_data_path = None
+for arg in sys.argv:
+    if arg.endswith("LimbusCompany.exe"):
+        data_path = pathlib.Path(arg).parent
+        data_path = os.path.join(data_path, "LimbusCompany_Data")
+        if os.path.isdir(data_path):
+            limbus_data_path = data_path
+
+additional_folders = []
+
+if limbus_data_path:
+    logging.info("Detected limbus steam data folder: %s", limbus_data_path)
+    additional_folders.append(limbus_data_path)
+else:
+    logging.info("Could not detect limbus steam data folder, are you in dev mode?")
+
+
 try:
     logging.info("Limbus args: %s", sys.argv)
     cleanup_assets()
@@ -62,7 +80,7 @@ try:
     logging.info("Extracting mod assets to %s", tmp_asset_root)
     patch.extract_assets(tmp_asset_root, mod_zips_root_path)
     logging.info("Backing up data and patching assets....")
-    patch.patch_assets(tmp_asset_root)
+    patch.patch_assets(tmp_asset_root, additional_folders)
     patch.shutil.rmtree(tmp_asset_root)
     sound.replace_sound(mod_zips_root_path)
     logging.info("Starting game")

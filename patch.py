@@ -124,7 +124,7 @@ def patch_bundle_asset(env: UnityPy.Environment, mod_path: str):
                 objects[path_id] = obj
 
 
-def patch_assets(mod_asset_root: str, bundle_data=bundle_data_paths):
+def patch_assets(mod_asset_root: str, additional_folders: list[str], bundle_data=bundle_data_paths):
     for bundle_root in bundle_data():
         # Move the original data to a new location temporarily
         bundle_root_path = Path(bundle_root)
