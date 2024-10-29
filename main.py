@@ -34,7 +34,7 @@ logging.basicConfig(
     ]
 )
 
-logging.info("Limbus Mod Loader version: v1.7.2")
+logging.info("Limbus Mod Loader version: v1.8")
 
 
 def kill_handler(*args) -> None:
